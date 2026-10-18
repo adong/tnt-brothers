@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#3fa9ff">
+<title>TNT Brothers</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%23ffc61a'/%3E%3Ctext x='50' y='68' font-size='52' font-family='Arial Black,Arial' font-weight='900' text-anchor='middle' fill='%23ffffff' stroke='%238a3b00' stroke-width='5' paint-order='stroke'%3ETT%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Rubik:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --yellow: #ffd400;
+    --pink: #ff3d7f;
+    --cyan: #18d4ff;
+    --blue: #3d8bff;
+    --red: #ff4b5c;
+    --green: #3fc22b;
+    --ink: #14121f;
+    --display: 'Bungee', 'Arial Black', Impact, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 100%; height: 100%; overflow: hidden;
+    background: #3fa9ff; color: #fff;
+    font-family: 'Rubik', system-ui, -apple-system, sans-serif;
+    touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  }
+  #game { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+  .hidden { opacity: 0 !important; pointer-events: none !important; visibility: hidden; }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .disp { font-family: var(--display); -webkit-text-stroke: 1.5px var(--ink); paint-order: stroke fill; text-shadow: 0 3px 0 var(--ink); }
+
+  /* ---------- HUD ---------- */
+  #hud { position: fixed; inset: 0; pointer-events: none; transition: opacity 0.2s; }
+  .top {
+    position: absolute; left: 0; right: 0; top: 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    padding: max(10px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) 0 max(12px, env(safe-area-inset-left));
+  }
+  .pill {
+    display: flex; align-items: center; gap: 6px; height: 40px; padding: 0 12px 0 6px; border-radius: 999px;
+    background: rgba(20, 18, 31, 0.55); border: 3px solid rgba(255, 255, 255, 0.85); box-shadow: 0 3px 0 var(--ink);
+    font-family: var(--display); font-size: 20px; line-height: 1; font-variant-numeric: tabular-nums;
+  }
+  .pill .ic { width: 28px; height: 28px; display: grid; place-items: center; font-size: 20px; font-family: initial; }
+  .pill img { width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle at 50% 35%, #a5dcff, #2a7bd6); object-fit: cover; border: 2px solid #fff; }
+  .pill img + img { margin-left: -12px; background: radial-gradient(circle at 50% 35%, #ffe2a0, #ff9f1c); }
+  .coin { width: 22px; height: 22px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #fff6b0, #ffcf2e 60%, #d48a00); border: 2px solid #b36b00; }
+  #lvlName { font: 800 13px/1.1 'Rubik', sans-serif; letter-spacing: 1px; padding: 6px 12px; border-radius: 999px; background: rgba(20, 18, 31, 0.45); max-width: 34vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .grow { flex: 1; }
+  #timeBox.low { color: #ff6a5a; animation: pulse 0.6s ease-in-out infinite; }
+  .ibtns { display: flex; gap: 8px; pointer-events: auto; }
+  .ibtn { width: 44px; height: 44px; border-radius: 12px; font-size: 18px; background: rgba(20, 18, 31, 0.5); border: 3px solid rgba(255, 255, 255, 0.8); display: grid; place-items: center; }
+  #toasts { position: absolute; left: 50%; top: 86px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .toast {
+    font-family: var(--display); font-size: clamp(18px, 3vw, 28px); color: var(--yellow); white-space: nowrap;
+    -webkit-text-stroke: 2px var(--ink); paint-order: stroke fill; text-shadow: 0 4px 0 var(--ink); animation: toast 1.6s ease-out forwards;
+  }
+  .toast.good { color: #9dff6a; }
+  .toast.warn { color: #ff8a7a; }
+  .toast.buddy { color: var(--cyan); }
+  @keyframes toast { 0% { opacity: 0; transform: scale(1.8); } 12% { opacity: 1; transform: scale(0.95); } 20% { transform: scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: translateY(-14px); } }
+  #tip {
+    position: absolute; left: 50%; bottom: 150px; transform: translateX(-50%); max-width: min(620px, 86vw); text-align: center;
+    font: 800 clamp(16px, 2.4vw, 22px)/1.3 'Rubik', sans-serif; color: var(--ink); background: #fffbe6; padding: 12px 20px;
+    border-radius: 18px; border: 4px solid var(--ink); box-shadow: 0 5px 0 var(--ink); transition: opacity 0.3s, transform 0.3s;
+  }
+  #tip.off { opacity: 0; transform: translate(-50%, 16px); }
+  @media (hover: hover) and (pointer: fine) { #tip { bottom: 40px; } }
+  .banner {
+    position: absolute; left: 0; right: 0; top: 34%; text-align: center; font-family: var(--display); opacity: 0;
+    font-size: clamp(44px, 10vw, 110px); line-height: 1; color: var(--yellow); padding: 0 12px;
+    -webkit-text-stroke: 4px var(--ink); paint-order: stroke fill;
+    text-shadow: 0 7px 0 var(--pink), 0 12px 0 var(--ink), 0 20px 30px rgba(0, 0, 0, 0.35); transition: opacity 0.25s;
+  }
+  .banner small { display: block; font-size: 0.36em; color: #fff; margin-top: 14px; text-shadow: 0 4px 0 var(--blue), 0 7px 0 var(--ink); -webkit-text-stroke: 2.5px var(--ink); }
+  .banner.show { opacity: 1; animation: slam 0.45s cubic-bezier(.2, 1.6, .4, 1); }
+  @keyframes slam { from { transform: scale(2.4) rotate(-8deg); opacity: 0; } }
+  @keyframes pulse { 50% { transform: scale(1.08); } }
+  #controlsHint { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); font: 700 12px/1 'Rubik', sans-serif; opacity: 0.85; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8); white-space: nowrap; }
+
+  /* the companion button: his face, a bar for how long he stays, and the key */
+  #budBtn {
+    position: absolute; right: max(14px, env(safe-area-inset-right)); top: max(64px, calc(env(safe-area-inset-top) + 54px));
+    display: flex; flex-direction: column; align-items: center; gap: 4px; pointer-events: auto; width: 96px;
+  }
+  #budBtn .face {
+    position: relative; width: 84px; height: 84px; border-radius: 50%; overflow: hidden; border: 4px solid #fff;
+    background: radial-gradient(circle at 50% 35%, #ffe2a0, #ff9f1c); box-shadow: 0 5px 0 var(--ink);
+  }
+  #budBtn img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.1) translateY(4%); }
+  #budBtn .face.two { display: flex; }
+  #budBtn .face.two img { width: 50%; transform: scale(1.5) translateY(6%); }
+  #budBtn .face .hi5 { position: absolute; right: -2px; bottom: -2px; font-size: 26px; }
+  #budBtn .nm { font-family: var(--display); font-size: 13px; -webkit-text-stroke: 1px var(--ink); paint-order: stroke fill; text-shadow: 0 2px 0 var(--ink); white-space: nowrap; }
+  #budBtn .bar { width: 84px; height: 10px; border-radius: 6px; background: rgba(20, 18, 31, 0.6); border: 2px solid #fff; overflow: hidden; opacity: 0; }
+  #budBtn .bar i { display: block; height: 100%; width: 100%; transform-origin: left; background: linear-gradient(90deg, #9dff6a, #3fc22b); }
+  #budBtn.on .face { border-color: var(--yellow); box-shadow: 0 5px 0 var(--ink), 0 0 18px rgba(255, 212, 0, 0.95); animation: pulse 0.8s ease-in-out infinite; }
+  #budBtn.on .bar, #budBtn.cool .bar { opacity: 1; }
+  #budBtn.cool .face { filter: grayscale(0.8); }
+  #budBtn.cool .bar i { background: rgba(255, 255, 255, 0.7); }
+  #budBtn .k { font: 800 11px/1 'Rubik', sans-serif; padding: 3px 6px; border-radius: 5px; background: #fff; color: var(--ink); }
+  .no { animation: nope 0.3s linear; }
+  @keyframes nope { 25% { translate: -5px 0; } 75% { translate: 5px 0; } }
+
+  /* ---------- touch controls ---------- */
+  #touch { position: fixed; inset: 0; pointer-events: none; }
+  #touch .tb {
+    position: absolute; pointer-events: auto; display: grid; place-items: center; border-radius: 50%;
+    background: rgba(255, 255, 255, 0.22); border: 4px solid rgba(255, 255, 255, 0.85); box-shadow: 0 5px 0 rgba(20, 18, 31, 0.6);
+    font-family: var(--display); color: #fff; -webkit-text-stroke: 1px var(--ink); paint-order: stroke fill; touch-action: none;
+  }
+  #touch .tb.down { background: rgba(255, 212, 0, 0.55); transform: translateY(3px); box-shadow: 0 2px 0 rgba(20, 18, 31, 0.6); }
+  #tLeft, #tRight { width: 96px; height: 96px; bottom: max(26px, env(safe-area-inset-bottom)); font-size: 40px; }
+  #tLeft { left: max(20px, env(safe-area-inset-left)); }
+  #tRight { left: calc(max(20px, env(safe-area-inset-left)) + 112px); }
+  #tDown { width: 64px; height: 64px; bottom: calc(max(26px, env(safe-area-inset-bottom)) + 108px); left: calc(max(20px, env(safe-area-inset-left)) + 72px); font-size: 26px; }
+  #tJump { width: 124px; height: 124px; right: max(22px, env(safe-area-inset-right)); bottom: max(26px, env(safe-area-inset-bottom)); font-size: 24px; background: rgba(61, 139, 255, 0.45); }
+  #tThrow { width: 84px; height: 84px; right: calc(max(22px, env(safe-area-inset-right)) + 140px); bottom: max(30px, env(safe-area-inset-bottom)); font-size: 38px; -webkit-text-stroke: 0; }
+  #tThrow.off { opacity: 0.35; }
+
+  @media (max-height: 460px) {
+    #tLeft, #tRight { width: 78px; height: 78px; font-size: 32px; }
+    #tRight { left: calc(max(20px, env(safe-area-inset-left)) + 92px); }
+    #tDown { width: 54px; height: 54px; bottom: calc(max(26px, env(safe-area-inset-bottom)) + 88px); left: calc(max(20px, env(safe-area-inset-left)) + 60px); }
+    #tJump { width: 100px; height: 100px; }
+    #tThrow { width: 70px; height: 70px; right: calc(max(22px, env(safe-area-inset-right)) + 114px); font-size: 30px; }
+    #budBtn { width: 76px; }
+    #budBtn .face { width: 64px; height: 64px; }
+    #budBtn .bar { width: 64px; }
+    .pill { height: 34px; font-size: 16px; }
+    #tip { bottom: 120px; }
+  }
+  /* phones held upright: ask to turn sideways (the game still works) */
+  #rotate { display: none; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 5; padding: 18px 22px; border-radius: 22px; background: #fffbe6; color: var(--ink); border: 4px solid var(--ink); box-shadow: 0 6px 0 var(--ink); font: 800 18px/1.3 'Rubik', sans-serif; text-align: center; pointer-events: none; }
+  @media (orientation: portrait) and (pointer: coarse) { #rotate { display: block; } }
+
+  /* ---------- screens ---------- */
+  .screen {
+    position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+    padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)); text-align: center; transition: opacity 0.25s;
+  }
+  .dim { background: rgba(14, 12, 30, 0.55); }
+  #title { background: radial-gradient(ellipse at 50% 45%, rgba(14, 12, 30, 0.45), rgba(14, 12, 30, 0.12) 70%); }
+  .logo { font-family: var(--display); line-height: 0.92; color: var(--yellow); -webkit-text-stroke: 5px var(--ink); paint-order: stroke fill; text-shadow: 0 8px 0 var(--red), 0 14px 0 var(--ink), 0 22px 30px rgba(0, 0, 0, 0.35); font-size: clamp(54px, 12vw, 130px); transform: rotate(-3deg); }
+  .logo span { display: block; color: #fff; font-size: 0.5em; text-shadow: 0 6px 0 var(--blue), 0 11px 0 var(--ink); }
+  .sub { font: 800 clamp(14px, 2.2vw, 19px)/1.3 'Rubik', sans-serif; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7); max-width: 640px; }
+  .row { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+  .big {
+    min-width: 200px; padding: 16px 26px; border-radius: 22px; font-family: var(--display); font-size: clamp(20px, 3vw, 28px);
+    background: linear-gradient(180deg, #ffe14d, #ffb000); color: var(--ink); border: 4px solid var(--ink); box-shadow: 0 7px 0 var(--ink);
+    transition: transform 0.1s;
+  }
+  .big.blue { background: linear-gradient(180deg, #7fd0ff, #2f8cff); color: #fff; -webkit-text-stroke: 1.5px var(--ink); paint-order: stroke fill; }
+  .big.ghost { background: rgba(255, 255, 255, 0.92); }
+  .big:active, .big.sel { transform: translateY(3px) scale(1.04); box-shadow: 0 4px 0 var(--ink); outline: 4px solid #fff; }
+  .seg { display: flex; border-radius: 16px; overflow: hidden; border: 4px solid var(--ink); box-shadow: 0 5px 0 var(--ink); }
+  .seg button { padding: 10px 18px; font-family: var(--display); font-size: 17px; background: rgba(255, 255, 255, 0.85); color: var(--ink); }
+  .seg button.on { background: var(--green); color: #fff; -webkit-text-stroke: 1px var(--ink); paint-order: stroke fill; }
+  .keys { font: 700 13px/1.6 'Rubik', sans-serif; opacity: 0.92; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8); }
+  .keys b { background: #fff; color: var(--ink); padding: 1px 6px; border-radius: 5px; margin: 0 1px; }
+  .cards { display: flex; gap: 22px; flex-wrap: wrap; justify-content: center; }
+  .card {
+    width: 210px; padding: 14px 12px 16px; border-radius: 26px; background: rgba(255, 255, 255, 0.95); color: var(--ink);
+    border: 5px solid var(--ink); box-shadow: 0 8px 0 var(--ink); display: flex; flex-direction: column; align-items: center; gap: 6px;
+  }
+  .card img { width: 150px; height: 150px; border-radius: 50%; background: radial-gradient(circle at 50% 35%, #a5dcff, #2a7bd6); object-fit: cover; border: 4px solid var(--ink); }
+  .card.tommy img { background: radial-gradient(circle at 50% 35%, #ffe2a0, #ff9f1c); }
+  .card .nm { font-family: var(--display); font-size: 30px; }
+  .card .ds { font: 700 13px/1.3 'Rubik', sans-serif; opacity: 0.8; }
+  .card.sel { outline: 6px solid var(--yellow); transform: translateY(-4px) scale(1.04); }
+
+  /* the world map */
+  #map { justify-content: flex-start; overflow-y: auto; touch-action: pan-y; }
+  #map h2 { font-family: var(--display); font-size: clamp(30px, 5vw, 48px); color: var(--yellow); -webkit-text-stroke: 3px var(--ink); paint-order: stroke fill; text-shadow: 0 5px 0 var(--ink); }
+  .worlds { display: grid; grid-template-columns: repeat(4, minmax(150px, 1fr)); gap: 14px; width: min(1100px, 100%); }
+  @media (max-width: 760px) { .worlds { grid-template-columns: repeat(2, 1fr); } }
+  .world { border-radius: 24px; border: 4px solid var(--ink); box-shadow: 0 6px 0 var(--ink); padding: 12px 10px 14px; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+  .world h3 { font-family: var(--display); font-size: 16px; -webkit-text-stroke: 1px var(--ink); paint-order: stroke fill; text-shadow: 0 2px 0 var(--ink); }
+  .world.park { background: linear-gradient(180deg, #7ad0ff, #6ccf52); }
+  .world.subway { background: linear-gradient(180deg, #3a4560, #232a3c); }
+  .world.sky { background: linear-gradient(180deg, #3f9cff, #d8f0ff); }
+  .world.castle { background: linear-gradient(180deg, #2b1d4a, #7a4f9e); }
+  .nodes { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+  .node { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 18px; background: rgba(255, 255, 255, 0.92); color: var(--ink); border: 3px solid var(--ink); box-shadow: 0 4px 0 var(--ink); text-align: left; }
+  .node .n { flex: none; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; font-family: var(--display); font-size: 22px; background: var(--yellow); border: 3px solid var(--ink); }
+  .node .t { font: 800 14px/1.15 'Rubik', sans-serif; }
+  .node .b { display: block; font: 700 11px/1.3 'Rubik', sans-serif; opacity: 0.7; }
+  .node.locked { opacity: 0.55; filter: grayscale(0.8); }
+  .node.locked .n { background: #bbb; }
+  .node.done .n { background: #9dff6a; }
+  .node.sel { outline: 5px solid #fff; transform: scale(1.04); box-shadow: 0 4px 0 var(--ink), 0 0 22px rgba(255, 255, 255, 0.9); }
+  .stats { font: 800 clamp(16px, 2.5vw, 22px)/1.6 'Rubik', sans-serif; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7); }
+  .stats b { color: var(--yellow); font-family: var(--display); }
+  .newbest { display: inline-block; font-family: var(--display); color: var(--ink); background: #9dff6a; padding: 4px 12px; border-radius: 10px; border: 3px solid var(--ink); transform: rotate(-4deg); animation: pulse 0.8s infinite; }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<div id="hud" class="hidden">
+  <div class="top">
+    <div class="pill"><img id="hudFace0" alt=""><img id="hudFace1" alt=""><span class="ic">❤️</span><span id="lives">5</span></div>
+    <div class="pill"><span class="ic"><i class="coin"></i></span><span id="coins">0</span></div>
+    <div class="pill"><span class="ic">⭐</span><span id="score">0</span></div>
+    <div id="lvlName"></div>
+    <div class="pill" id="bossPill" style="display:none"><span class="ic">👑</span><span id="bossHp">❤️❤️❤️</span></div>
+    <div class="grow"></div>
+    <div class="pill" id="timeBox"><span class="ic">⏱️</span><span id="time">300</span></div>
+    <div class="ibtns"><button class="ibtn" id="pauseBtn" title="Pause (P)">❚❚</button><button class="ibtn" id="muteBtn" title="Sound (M)">🔊</button></div>
+  </div>
+  <div id="toasts"></div>
+  <div id="tip" class="off"></div>
+  <div id="banner" class="banner"></div>
+  <button id="budBtn" title="Call your brother (T)">
+    <span class="face" id="budFaceWrap"><img id="budFace" alt=""></span>
+    <span class="bar"><i id="budFill"></i></span>
+    <span class="nm" id="budName">TOMMY</span>
+    <span class="k" id="budKey">T</span>
+  </button>
+  <div id="controlsHint"></div>
+</div>
+
+<div id="touch" class="hidden">
+  <div class="tb" id="tLeft">◀</div>
+  <div class="tb" id="tRight">▶</div>
+  <div class="tb" id="tDown">▼</div>
+  <div class="tb" id="tThrow">🏀</div>
+  <div class="tb" id="tJump">JUMP</div>
+</div>
+
+<div id="rotate">📱 ↻<br>Turn sideways to play!</div>
+
+<div id="title" class="screen">
+  <div class="logo" id="logo">TNT<span>BROTHERS</span></div>
+  <div class="sub">Teddy &amp; Tommy's big adventure: 10 levels, from the backyard to the Zombie King's castle!</div>
+  <div class="row">
+    <button class="big" id="b1p">1 PLAYER</button>
+    <button class="big blue" id="b2p">2 PLAYERS</button>
+  </div>
+  <div class="seg" id="diff"><button data-d="easy">🐣 EASY</button><button data-d="normal">🔥 NORMAL</button></div>
+  <div class="keys" id="diffNote"></div>
+  <div class="keys">Move <b>←</b><b>→</b> or <b>A</b><b>D</b> · Jump <b>Space</b> · Run <b>Shift</b> · Throw <b>F</b> · Down <b>↓</b> · Call your brother <b>T</b> · Pause <b>P</b></div>
+</div>
+
+<div id="pick" class="screen dim hidden">
+  <div class="logo" style="font-size:clamp(34px,6vw,64px)">WHO'S PLAYING?</div>
+  <div class="cards">
+    <button class="card teddy" data-ch="teddy"><img alt=""><span class="nm">TEDDY</span><span class="ds">Throws 🏀 basketballs. Buddy: Tommy</span></button>
+    <button class="card tommy" data-ch="tommy"><img alt=""><span class="nm">TOMMY</span><span class="ds">Throws ✌️ stars. Buddy: Teddy</span></button>
+  </div>
+  <div class="row"><button class="big ghost" id="pickBack">◀ BACK</button></div>
+</div>
+
+<div id="map" class="screen dim hidden">
+  <h2>WORLD MAP</h2>
+  <div class="sub" id="mapWho"></div>
+  <div class="worlds" id="worlds"></div>
+  <div class="row"><button class="big ghost" id="mapBack">◀ BACK</button><button class="big" id="mapGo">PLAY ▶</button></div>
+</div>
+
+<div id="pause" class="screen dim hidden">
+  <div class="logo" style="font-size:clamp(40px,8vw,80px)">PAUSED</div>
+  <div class="row">
+    <button class="big" id="pResume">▶ RESUME</button>
+    <button class="big ghost" id="pRestart">↻ RESTART</button>
+    <button class="big ghost" id="pMap">🗺️ MAP</button>
+  </div>
+</div>
+
+<div id="clear" class="screen dim hidden">
+  <div class="logo" style="font-size:clamp(40px,8vw,84px)">LEVEL CLEAR!</div>
+  <div class="stats" id="clearStats"></div>
+  <div class="row"><button class="big ghost" id="cMap">🗺️ MAP</button><button class="big" id="cNext">NEXT ▶</button></div>
+</div>
+
+<div id="over" class="screen dim hidden">
+  <div class="logo" style="font-size:clamp(40px,8vw,84px)">OUT OF LIVES!</div>
+  <div class="sub">Good try! Your levels stay unlocked, and you get a fresh set of lives.</div>
+  <div class="row"><button class="big ghost" id="oMap">🗺️ MAP</button><button class="big" id="oRetry">↻ TRY AGAIN</button></div>
+</div>
+
+<div id="end" class="screen dim hidden">
+  <div class="logo" style="font-size:clamp(36px,7vw,76px)">YOU BONKED<span>THE ZOMBIE KING!</span></div>
+  <div class="sub">Teddy &amp; Tommy saved the day. The TNT Brothers are the champions! 🏆</div>
+  <div class="stats" id="endStats"></div>
+  <div class="row"><button class="big" id="eMap">🗺️ MAP</button></div>
+</div>
+
+<script src="kit/three.min.js"></script>
+<script src="kit/gfx.js"></script>
+<script src="kit/people.js"></script>
+<script src="kit/roster.js"></script>
+<script src="kit/portraits.js"></script>
+<script src="kit/sound.js"></script>
+<script src="js/title.js"></script>
+<script src="js/levels.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/bot.js"></script>
+<script src="js/demos.js"></script>
+<script src="js/sfx.js"></script>
+<script src="js/poses.js"></script>
+<script src="js/art.js"></script>
+<script src="js/world.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>
