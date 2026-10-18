@@ -2,6 +2,10 @@
 
 [![TNT Brothers title screen](docs/screenshot.jpg)](https://adong.github.io/tnt-brothers/)
 
+A side-scrolling platformer: jump, stomp zombies and reach the flag. 10 levels, 1 or 2 players.
+
+**中文：** 横版闯关：跳跃、踩僵尸、冲到旗杆。10 关，单人或双人。
+
 Press **?** any time (or tap the round **?** button on the left edge) to see the keys. The game waits while you look.
 Tap the language button under it (the A文 icon) to switch between English and 中文; the dashboard and every game remember the choice.
 

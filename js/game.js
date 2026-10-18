@@ -41,7 +41,7 @@
   world.onSwish = () => { sfx('swish'); world.text('SWISH!', world.camX, 9, '#ffd400'); };
   const faces = Kit.portraits(['teddy', 'tommy'].map((id) => Kit.roster.get(id)), { size: 160 });
 
-  document.title = TITLE;
+  document.title = `${TITLE} · Teddy & Tommy`;
   $('logo').innerHTML = TITLE.replace(/^(\S+)\s+(.*)$/, '$1<span>$2</span>').toUpperCase();
   document.querySelectorAll('.card').forEach((c) => (c.querySelector('img').src = faces[c.dataset.ch]));
 
