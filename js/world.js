@@ -848,7 +848,7 @@
     }
 
     text(word, x, y, color) {
-      const s = sprite(A.textTex(word, color), 1);
+      const s = sprite(A.textTex(Kit.lang ? Kit.lang.t(word) : word, color), 1);
       s.scale.set(2.6, 0.95, 1);
       s.position.set(x, y, 1);
       this.fx.add(s);

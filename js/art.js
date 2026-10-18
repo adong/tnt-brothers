@@ -278,8 +278,9 @@
     });
   }
 
-  // A comic burst with a word in it: POW!, BONK!, POP!
+  // A comic burst with a word in it: POW!, BONK!, POP! (in 中文 too: the word goes through Kit.lang)
   function burstTex(word, color = '#ffd400') {
+    word = Kit.lang ? Kit.lang.t(word) : word;
     return memo('burst' + word + color, () => {
       const [c, g] = makeCanvas(256, 256);
       g.beginPath();
@@ -293,7 +294,9 @@
       g.lineWidth = 10;
       g.strokeStyle = '#14121f';
       g.stroke();
-      g.font = `bold 66px ${BLOCK_FONT}`;
+      let size = 66;
+      g.font = `bold ${size}px ${BLOCK_FONT}`;
+      while (g.measureText(word).width > 190 && size > 30) g.font = `bold ${(size -= 4)}px ${BLOCK_FONT}`;
       g.textAlign = 'center';
       g.textBaseline = 'middle';
       g.lineWidth = 12;
@@ -307,7 +310,9 @@
   function textTex(text, color = '#ffffff') {
     return memo('text' + text + color, () => {
       const [c, g] = makeCanvas(256, 96);
-      g.font = `bold 60px ${BLOCK_FONT}`;
+      let size = 60;
+      g.font = `bold ${size}px ${BLOCK_FONT}`;
+      while (g.measureText(text).width > 236 && size > 26) g.font = `bold ${(size -= 4)}px ${BLOCK_FONT}`;
       g.textAlign = 'center';
       g.textBaseline = 'middle';
       g.lineWidth = 12;

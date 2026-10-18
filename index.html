@@ -142,6 +142,7 @@
     position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
     padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)); text-align: center; transition: opacity 0.25s;
   }
+  .screen > * { flex-shrink: 0; }
   .dim { background: rgba(14, 12, 30, 0.55); }
   #title { background: radial-gradient(ellipse at 50% 45%, rgba(14, 12, 30, 0.45), rgba(14, 12, 30, 0.12) 70%); }
   .logo { font-family: var(--display); line-height: 0.92; color: var(--yellow); -webkit-text-stroke: 5px var(--ink); paint-order: stroke fill; text-shadow: 0 8px 0 var(--red), 0 14px 0 var(--ink), 0 22px 30px rgba(0, 0, 0, 0.35); font-size: clamp(54px, 12vw, 130px); transform: rotate(-3deg); }
@@ -195,6 +196,20 @@
   .stats { font: 800 clamp(16px, 2.5vw, 22px)/1.6 'Rubik', sans-serif; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7); }
   .stats b { color: var(--yellow); font-family: var(--display); }
   .newbest { display: inline-block; font-family: var(--display); color: var(--ink); background: #9dff6a; padding: 4px 12px; border-radius: 10px; border: 3px solid var(--ink); transform: rotate(-4deg); animation: pulse 0.8s infinite; }
+  /* short landscape phones: smaller menus (after the rules above, so these win) */
+  @media (max-height: 460px) {
+    .screen { gap: 10px; overflow-y: auto; }
+    #logo { font-size: 58px; }
+    .screen .logo { font-size: min(52px, 11vw) !important; }
+    #title .logo { font-size: 58px !important; }
+    .big { padding: 10px 22px; font-size: 20px; min-width: 160px; }
+    .seg button { padding: 7px 14px; font-size: 15px; }
+    .card { width: 170px; padding: 10px 10px 12px; }
+    .card img { width: 76px; height: 76px; }
+    .card .nm { font-size: 22px; }
+    .card { gap: 3px; }
+    .cards { gap: 14px; }
+  }
 </style>
 </head>
 <body>
@@ -242,7 +257,7 @@
   </div>
   <div class="seg" id="diff"><button data-d="easy">🐣 EASY</button><button data-d="normal">🔥 NORMAL</button></div>
   <div class="keys" id="diffNote"></div>
-  <div class="keys">Move <b>←</b><b>→</b> or <b>A</b><b>D</b> · Jump <b>Space</b> · Run <b>Shift</b> · Throw <b>F</b> · Down <b>↓</b> · Call your brother <b>T</b> · Pause <b>P</b></div>
+  <div class="keys" data-zh="移动 <b>←</b><b>→</b> 或 <b>A</b><b>D</b> · 跳 <b>空格</b> · 跑 <b>Shift</b> · 扔 <b>F</b> · 钻通风管 <b>↓</b> · 叫兄弟来帮忙 <b>T</b> · 暂停 <b>P</b>">Move <b>←</b><b>→</b> or <b>A</b><b>D</b> · Jump <b>Space</b> · Run <b>Shift</b> · Throw <b>F</b> · Down <b>↓</b> · Call your brother <b>T</b> · Pause <b>P</b></div>
 </div>
 
 <div id="pick" class="screen dim hidden">
@@ -295,6 +310,7 @@
 <script src="kit/roster.js"></script>
 <script src="kit/portraits.js"></script>
 <script src="kit/sound.js"></script>
+<script src="kit/lang.js"></script>
 <script src="kit/help.js"></script>
 <script src="js/title.js"></script>
 <script src="js/levels.js"></script>
@@ -307,5 +323,6 @@
 <script src="js/world.js"></script>
 <script src="js/game.js"></script>
 <script src="js/keys.js"></script>
+<script src="js/zh.js"></script>
 </body>
 </html>

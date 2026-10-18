@@ -144,7 +144,7 @@
       P.h = P.pow ? PH.bigH : PH.smallH;
     });
     // tips before the start point are skipped
-    while (S.tipI < lv.tips.length && lv.tips[S.tipI][0] < sx - 1) S.tipI++;
+    while (S.tipI < lv.tips.length && lv.tips[S.tipI][0] < sx - 2) S.tipI++;
     S.cam.x = clampCam(S, sx + 4);
     return S;
   }
