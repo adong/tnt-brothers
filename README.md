@@ -3,7 +3,7 @@
 [![TNT Brothers title screen](docs/screenshot.jpg)](https://adong.github.io/tnt-brothers/)
 
 Press **?** any time (or tap the round **?** button on the left edge) to see the keys. The game waits while you look.
-Tap **中文 / EN** under it to switch between English and 中文 (the dashboard and every game remember the choice).
+Tap the language button under it (the A文 icon) to switch between English and 中文; the dashboard and every game remember the choice.
 
 A side-scrolling platformer in the spirit of the classic arcade ones, starring Teddy and Tommy as the **TNT Brothers** (TNT = Teddy & Tommy). Run, jump, bonk blocks, stomp silly zombies and robots, and make it through 10 levels, from the backyard to the Zombie King's castle. It's built with Claude Code from plain JavaScript and Three.js, on the shared Claude Games kit.
 There are no image, model or audio files: the brothers and everyone else are the kit's blocky characters, every texture is painted on a canvas, and every sound is synthesised.
